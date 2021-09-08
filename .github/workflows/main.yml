@@ -27,7 +27,6 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -o build/${BINARY_NAME}-darwin-amd64 commander.go
           GOOS=darwin GOARCH=arm64 go build -o build/${BINARY_NAME}-darwin-arm64 commander.go
           GOOS=windows GOARCH=amd64 go build -o build/${BINARY_NAME}-windows-amd64.exe commander.go
-          GOOS=windows GOARCH=arm64 go build -o build/${BINARY_NAME}-windows-arm64.exe commander.go
       - name: Create artifacts
         uses: actions/upload-artifact@v2
         with:
