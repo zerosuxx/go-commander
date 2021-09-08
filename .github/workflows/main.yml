@@ -30,7 +30,7 @@ jobs:
       - name: Create artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${BINARY_NAME}-binaries
+          name: ${{ env.BINARY_NAME }}-binaries
           path: build/
 
   release:
@@ -43,7 +43,7 @@ jobs:
       - name: Download binaries artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${BINARY_NAME}-binaries
+          name: ${{ env.BINARY_NAME }}-binaries
           path: build/
       - name: Uploaded binaries as release assets
         run: |
