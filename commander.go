@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	version := "1.1.0"
+	version := "1.2.0"
 	port := "1234"
 	if len(os.Args) > 1 {
 		port = os.Args[1]

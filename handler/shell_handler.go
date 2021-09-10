@@ -1,24 +1,54 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
-	"io"
-	"os/exec"
-
 	"github.com/creack/pty"
 	"golang.org/x/net/websocket"
+	"io"
+	"net/url"
+	"os/exec"
+	"strconv"
 )
 
 func ShellServer(ws *websocket.Conn) {
-	c := exec.Command("bash")
-	f, err := pty.Start(c)
+	command := exec.Command("bash")
+
+	winSize := pty.Winsize{}
+	query := ws.Request().URL.Query()
+	if colsUint, colsErr := GetUintFromValues(query, "cols"); colsErr == nil {
+		winSize.Cols = colsUint
+	}
+
+	terminal, err := pty.StartWithSize(command, &winSize)
+
+	defer func() {
+		_ = terminal.Close()
+	}()
+
 	if err != nil {
-		ws.Write([]byte(fmt.Sprintf("Error creating pty: %s\r\n", err)))
-		ws.Close()
+		_, _ = ws.Write([]byte(fmt.Sprintf("Error creating pty: %s\r\n", err)))
+		_ = ws.Close()
 		return
 	}
 
-	go io.Copy(ws, f)
-	io.Copy(f, ws)
-	ws.Close()
+	go func() {
+		_, _ = io.Copy(ws, terminal)
+	}()
+	_, _ = io.Copy(terminal, ws)
+	_ = ws.Close()
+}
+
+func GetUintFromValues(values url.Values, key string) (uint16, error) {
+	value := values.Get(key)
+	if value == "" {
+		return 0, errors.New("empty " + key)
+	}
+
+	valueInt, err := strconv.ParseUint(value, 16, 16)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint16(valueInt), nil
 }
