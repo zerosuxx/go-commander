@@ -1,7 +1,7 @@
 .PHONY: build
 
 build: ## Build the application
-	CGO_ENABLED=0 go build -o build/http-commander commander.go
+	CGO_ENABLED=0 go build -o build/commander commander.go
 
 install: ## Install the binary
 	go get -d ./...

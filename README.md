@@ -1,4 +1,4 @@
-# go-http-commander
+# go-commander
 
 ## build
 ```

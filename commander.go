@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/zerosuxx/go-http-commander/handler"
+	"github.com/zerosuxx/go-commander/handler"
 	"golang.org/x/net/websocket"
 	"log"
 	"net/http"

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/zerosuxx/go-http-commander/utility"
+	"github.com/zerosuxx/go-commander/utility"
 	"io"
 	"io/ioutil"
 	"log"

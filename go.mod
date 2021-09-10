@@ -1,4 +1,4 @@
-module github.com/zerosuxx/go-http-commander
+module github.com/zerosuxx/go-commander
 
 go 1.16
 
