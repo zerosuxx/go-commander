@@ -14,4 +14,5 @@ make start # listening on localhost:1234
 ```
 POST /cmd # Request body: '["command", "arg1", ...]'
 GET /healthcheck
+WS /echo # WebSocket (echo protocol)
 ```
