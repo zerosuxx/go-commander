@@ -2,13 +2,14 @@ package main
 
 import (
 	"github.com/zerosuxx/go-http-commander/handler"
+	"golang.org/x/net/websocket"
 	"log"
 	"net/http"
 	"os"
 )
 
 func main() {
-	version := "1.0.1"
+	version := "1.1.0"
 	port := "1234"
 	if len(os.Args) > 1 {
 		port = os.Args[1]
@@ -22,5 +23,8 @@ func main() {
 	http.HandleFunc("/cmd", handler.CreateCommandHandler().Handle)
 	log.Println("POST /cmd")
 
-	log.Fatal(http.ListenAndServe(":" + port, nil))
+	http.Handle("/echo", websocket.Handler(handler.ShellServer))
+	log.Println("WS /echo")
+
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
