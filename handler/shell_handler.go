@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/websocket"
 	"io"
 	"net/url"
+	"os"
 	"os/exec"
 	"strconv"
 )
@@ -20,22 +21,24 @@ func ShellServer(ws *websocket.Conn) {
 		winSize.Cols = colsUint
 	}
 
-	terminal, err := pty.StartWithSize(command, &winSize)
+	ptyTerminal, ptyErr := pty.StartWithSize(command, &winSize)
 
 	defer func() {
-		_ = terminal.Close()
+		_ = command.Process.Release()
+		_ = command.Process.Signal(os.Interrupt)
+		_ = ptyTerminal.Close()
 	}()
 
-	if err != nil {
-		_, _ = ws.Write([]byte(fmt.Sprintf("Error creating pty: %s\r\n", err)))
+	if ptyErr != nil {
+		_, _ = ws.Write([]byte(fmt.Sprintf("Error creating pty: %s\r\n", ptyErr)))
 		_ = ws.Close()
 		return
 	}
 
 	go func() {
-		_, _ = io.Copy(ws, terminal)
+		_, _ = io.Copy(ws, ptyTerminal)
 	}()
-	_, _ = io.Copy(terminal, ws)
+	_, _ = io.Copy(ptyTerminal, ws)
 	_ = ws.Close()
 }
 
