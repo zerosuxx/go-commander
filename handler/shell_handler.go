@@ -24,6 +24,7 @@ func ShellServer(ws *websocket.Conn) {
 	ptyTerminal, ptyErr := pty.StartWithSize(command, &winSize)
 
 	defer func() {
+		_ = command.Wait()
 		_ = command.Process.Release()
 		_ = command.Process.Signal(os.Interrupt)
 		_ = ptyTerminal.Close()
