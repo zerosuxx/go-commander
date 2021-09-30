@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"github.com/zerosuxx/go-commander/utility"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,7 +13,6 @@ type CommandHandler struct {
 }
 
 func (handler *CommandHandler) Handle(res http.ResponseWriter, req *http.Request) {
-	inputReader, outputWriter := io.Pipe()
 	reqBody, _ := ioutil.ReadAll(req.Body)
 
 	if len(reqBody) == 0 {
@@ -35,20 +33,17 @@ func (handler *CommandHandler) Handle(res http.ResponseWriter, req *http.Request
 	}
 
 	log.Printf("Command: %v", commandWithArgs)
+	commandOutput, err := handler.Shell.Exec(commandWithArgs[0], commandWithArgs[1:])
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		_, _ = res.Write([]byte(err.Error()))
 
-	go func() {
-		if _, err := io.Copy(res, inputReader); err != nil {
-			utility.LogError(err)
-		}
-	}()
-
-	if err := handler.Shell.Run(commandWithArgs[0], commandWithArgs[1:], outputWriter); err != nil {
-		_, _ = outputWriter.Write([]byte(err.Error()))
-		utility.LogError(err)
+		return
 	}
 
-	if err := outputWriter.Close(); err != nil {
-		log.Println(err)
+	res.WriteHeader(http.StatusOK)
+	_, err = res.Write(commandOutput)
+	if err != nil {
 		utility.LogError(err)
 	}
 }

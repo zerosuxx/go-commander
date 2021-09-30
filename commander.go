@@ -8,14 +8,15 @@ import (
 	"os"
 )
 
+var Version = "development"
+
 func main() {
-	version := "1.2.2"
 	port := "1234"
 	if len(os.Args) > 1 {
 		port = os.Args[1]
 	}
 
-	log.Println("Http c0mmander " + version + " | Server listening on: http://localhost:" + port)
+	log.Println("Http c0mmander " + Version + " | Server listening on: http://localhost:" + port)
 
 	http.HandleFunc("/healthcheck", handler.CreateHealthCheckHandler().Handle)
 	log.Println("GET /healthcheck")
