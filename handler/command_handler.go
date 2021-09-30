@@ -33,11 +33,11 @@ func (handler *CommandHandler) Handle(res http.ResponseWriter, req *http.Request
 	}
 
 	log.Printf("Command: %v", commandWithArgs)
-	commandOutput, err := handler.Shell.Exec(commandWithArgs[0], commandWithArgs[1:])
+
+	commandOutput, err := handler.Shell.Exec(commandWithArgs[0], commandWithArgs[1:], 30)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		_, _ = res.Write([]byte(err.Error()))
-
+		_, _ = res.Write([]byte(err.Error() + "\n"))
 		return
 	}
 
