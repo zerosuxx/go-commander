@@ -24,7 +24,7 @@ func main() {
 	http.HandleFunc("/cmd", handler.CreateCommandHandler().Handle)
 	log.Println("POST /cmd")
 
-	http.Handle("/echo", websocket.Handler(handler.ShellServer))
+	http.Handle("/echo", websocket.Handler(handler.EchoHandler))
 	log.Println("WS /echo")
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))

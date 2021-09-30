@@ -7,12 +7,11 @@ import (
 	"golang.org/x/net/websocket"
 	"io"
 	"net/url"
-	"os"
 	"os/exec"
 	"strconv"
 )
 
-func ShellServer(ws *websocket.Conn) {
+func EchoHandler(ws *websocket.Conn) {
 	command := exec.Command("bash")
 
 	winSize := pty.Winsize{}
@@ -20,14 +19,16 @@ func ShellServer(ws *websocket.Conn) {
 	if colsUint, colsErr := GetUintFromValues(query, "cols"); colsErr == nil {
 		winSize.Cols = colsUint
 	}
+	if rowsUint, rowsErr := GetUintFromValues(query, "rows"); rowsErr == nil {
+		winSize.Rows = rowsUint
+	}
 
 	ptyTerminal, ptyErr := pty.StartWithSize(command, &winSize)
 
 	defer func() {
-		_ = command.Wait()
-		_ = command.Process.Release()
-		_ = command.Process.Signal(os.Interrupt)
+		_, _ = ptyTerminal.Write([]byte("exit\n"))
 		_ = ptyTerminal.Close()
+		_ = command.Wait()
 	}()
 
 	if ptyErr != nil {
